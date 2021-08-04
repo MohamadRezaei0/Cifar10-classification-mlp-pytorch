@@ -27,6 +27,7 @@ class Net(nn.Module):
 
 
     def train(self, trainloader, optimizer, criterion, epochs):
+        hist = []
         for epoch in range(epochs):  # loop over the dataset multiple times
             running_loss = 0.0
             for i, data in enumerate(trainloader, 0):
@@ -45,12 +46,14 @@ class Net(nn.Module):
 
                 # print statistics
                 running_loss += loss.item()
-                if i % 2000 == 1999:    # print every 2000 mini-batches
-                    print('[%d, %5d] loss: %.3f' %
-                          (epoch + 1, i + 1, running_loss / 2000))
-                    running_loss = 0.0
+            # if i % 2000 == 1999:    # print every 2000 mini-batches
+            print('[%d, %5d] loss: %.3f' %
+                  (epoch + 1, i + 1, running_loss / 2000))
+            hist.append(running_loss)
+            running_loss = 0.0
 
         print('Finished Training')
+        return hist
 
 
     def score(self, testloader):
