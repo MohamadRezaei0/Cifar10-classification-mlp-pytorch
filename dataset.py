@@ -1,10 +1,10 @@
 import torch
+import pickle
 import numpy as np
 from torch.utils.data import Dataset
 
 
 def unpickle(file):
-    import pickle
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
     return dict
@@ -51,22 +51,24 @@ class Cifar10(Dataset):
             )
 
     def __init__(self, root_dir, transform=None):
-        self.data = unpickle(root_dir)
+        data = unpickle(root_dir)
+        self.images = list(map(to_image_array, data[b'data']))
+        self.labels = data[b'labels']
         self.transform = transform
 
     def __getitem__(self, idx):
         if(torch.is_tensor(idx)):
             idx = idx.tolist()
 
-        image = to_image_array(self.data[b'data'][idx])
-        label = self.data[b'labels'][idx]
+        image = self.images[idx]
+        label = self.labels[idx]
         sample = (image, label)
         if(self.transform):
             sample = (self.transform(sample[0]), sample[1])
         return sample
 
     def __len__(self):
-        return len(self.data[b'labels'])
+        return self.labels.__len__()
 
     def copy(self):
         import copy
