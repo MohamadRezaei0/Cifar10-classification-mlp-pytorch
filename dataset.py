@@ -6,20 +6,37 @@ from torch.utils.data import Dataset
 
 
 def unpickle(file):
+    """
+        load pickle file as a dictionary
+    """
+
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
     return dict
 
-def to_image_array(image, n_channels=1024):
+def to_image_array(image, n_channels=1024, dshape=(32, 32,3)):
+    """
+        convert image vector(n_channels*R, n_channels*G, n_channels*B)
+        to image matrix (n_channels*(R, G, B))
+    """
+
     r = image[0:n_channels]
     g = image[n_channels:2*n_channels]
     b = image[2*n_channels:3*n_channels]
-    return np.array(list(zip(r, g, b))).reshape(32, 32,3)
+    return np.array(list(zip(r, g, b))).reshape(*dshape)
 
 def concatenate(datasets:list):
+    """
+        convert list of dataset objects to
+        one dataset object
+    """
+
+    # copy one of the datasets
     result = datasets[0].copy()
     data_list = datasets[1:]
 
+    # concat rest of dataset objects
+    # with the first dataset in the list
     for data in data_list:
         result.images = np.concatenate([result.images, data.images])
         result.labels = list(np.concatenate([result.labels, data.labels]))
