@@ -1,5 +1,6 @@
 import torch
 import pickle
+import copy
 import numpy as np
 from torch.utils.data import Dataset
 
@@ -20,10 +21,8 @@ def concatenate(datasets:list):
     data_list = datasets[1:]
 
     for data in data_list:
-        result.data[b'data'] = np.concatenate([result.data[b'data'], data.data[b'data']])
-        result.data[b'labels'] = list(np.concatenate([result.data[b'labels'], data.data[b'labels']]))
-
-    return result
+        result.images = np.concatenate([result.images, data.images])
+        result.labels = list(np.concatenate([result.labels, data.labels]))
 
     return result
 
@@ -71,5 +70,4 @@ class Cifar10(Dataset):
         return self.labels.__len__()
 
     def copy(self):
-        import copy
         return copy.deepcopy(self)
